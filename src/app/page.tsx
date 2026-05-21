@@ -9,36 +9,54 @@ import TopNav from "./components/TopNav";
 // What I'm actively building right now. Keep this honest — only real, active work.
 const BUILDING: { name: string; note: string; body: string; href: string }[] = [
   {
+    name: "Lore",
+    note: "launching soon",
+    href: "https://github.com/Hanishsaini/Lore",
+    body: "Persistent memory for AI coding agents — your codebase's memory, so agents stop repeating your team's past mistakes. The biggest thing I'm building, and nearly done: shipping shortly as a pip-installable CLI.",
+  },
+  {
     name: "Complico",
     note: "compliance copilot",
     href: "https://github.com/Hanishsaini/complico",
     body: "Collapsing the SOC 2 / ISO 27001 readiness loop from weeks into a 90-second feedback cycle — per-control gap analysis with evidence quoted straight from your documents.",
   },
   {
-    name: "Lore",
-    note: "memory for AI agents",
-    href: "https://github.com/Hanishsaini/Lore",
-    body: "Persistent organizational memory for AI coding agents — your codebase's memory, so agents stop repeating your team's past mistakes.",
-  },
-  {
     name: "AI Workspace",
-    note: "real-time collaboration",
+    note: "real-time · live demo",
     href: "https://github.com/Hanishsaini/ai-workspace",
-    body: "One AI session shared by two people — a single upstream call streamed into both screens, character by character, with shared cursors and presence.",
+    body: "One AI session shared by two people, streamed into both screens with shared cursors and presence. The frontend is live on Vercel; the realtime server is mid-deploy, so today it's a working demo.",
   },
 ];
 
 // Projects. Honest, in my own words. Tags are drawn only from what each repo actually uses.
+// `live` is set only where there's a real, clickable URL — never a placeholder.
 const PROJECTS: {
   name: string;
   state: string;
   href: string;
+  live?: string;
   body: ReactNode;
   stack: string[];
 }[] = [
   {
+    name: "Lore",
+    state: "launching · 2026",
+    href: "https://github.com/Hanishsaini/Lore",
+    body: (
+      <>
+        Your codebase&apos;s memory. Persistent organizational memory for AI
+        coding agents — so they stop repeating your team&apos;s past mistakes.
+        The bet is simple: agents are only as good as what they remember, and
+        right now they remember almost nothing between sessions. It&apos;s the
+        biggest thing I&apos;m building, and nearly done — shipping shortly as a
+        pip-installable CLI you can drop into your own workflow.
+      </>
+    ),
+    stack: ["memory systems", "AI agents", "Python", "CLI"],
+  },
+  {
     name: "Complico",
-    state: "in progress · 2026",
+    state: "in development · 2026",
     href: "https://github.com/Hanishsaini/complico",
     body: (
       <>
@@ -58,32 +76,19 @@ const PROJECTS: {
     stack: ["Python", "FAISS", "RAG", "LLM swarm"],
   },
   {
-    name: "Lore",
-    state: "in progress · 2026",
-    href: "https://github.com/Hanishsaini/Lore",
-    body: (
-      <>
-        Your codebase&apos;s memory. Persistent organizational memory for AI
-        coding agents — so they stop repeating your team&apos;s past mistakes.
-        The bet is simple: agents are only as good as what they remember, and
-        right now they remember almost nothing between sessions. Lore is where I
-        keep working that problem.
-      </>
-    ),
-    stack: ["memory systems", "AI agents", "developer tooling"],
-  },
-  {
     name: "AI Workspace",
-    state: "in progress · 2026",
+    state: "frontend live · 2026",
     href: "https://github.com/Hanishsaini/ai-workspace",
+    // live: "https://...",  // ← drop the Vercel URL here and the "live demo" link appears
     body: (
       <>
         A real-time collaborative AI workspace where two people share one AI
         session — one upstream call, streamed live into both screens, character
         by character. Think Google Docs, but the second collaborator is an AI
-        you&apos;re both talking to at the same time. Type a prompt on one
-        screen, the answer streams onto both screens in lockstep; cursors,
-        presence, and edits are shared.
+        you&apos;re both talking to at the same time. The frontend is deployed on
+        Vercel; the realtime server is mid-deploy, so it&apos;s a working demo
+        today rather than a finished product — and I&apos;d rather say that than
+        pretend otherwise.
       </>
     ),
     stack: ["Next.js", "streaming", "real-time"],
@@ -191,7 +196,7 @@ export default function Home() {
             <div className="mt-8 flex items-center gap-2">
               <span className="status-dot" aria-hidden="true" />
               <span className="meta">
-                currently building Complico, Lore &amp; AI&nbsp;Workspace
+                shipping Lore — building Complico &amp; AI&nbsp;Workspace
               </span>
             </div>
 
@@ -276,12 +281,22 @@ export default function Home() {
                   {p.body}
                 </p>
 
-                <div className="mt-4 flex flex-wrap gap-2">
+                <div className="mt-4 flex flex-wrap items-center gap-2">
                   {p.stack.map((s) => (
                     <span key={s} className="tag">
                       {s}
                     </span>
                   ))}
+                  {p.live && (
+                    <a
+                      href={p.live}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="bare ml-1 text-[12px] text-accent"
+                    >
+                      live demo ↗
+                    </a>
+                  )}
                 </div>
               </Reveal>
             ))}
