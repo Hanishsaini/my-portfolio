@@ -4,21 +4,29 @@
 @theme {
   --color-paper: #F2EDE3;
   --color-paper-warm: #ECE6D8;
+  --color-paper-raised: #F7F3EB;
   --color-ink: #1A1916;
   --color-ink-soft: #3B3833;
   --color-ink-muted: #756F65;
   --color-ink-faint: #A8A096;
   --color-rule: #D9D2C2;
+  --color-rule-soft: #E4DECF;
   --color-accent: #7A2A1C;
 
   --font-serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
   --font-display: 'Instrument Serif', Georgia, serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 * {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 html, body {
@@ -29,6 +37,52 @@ html, body {
   line-height: 1.6;
   font-feature-settings: "kern", "liga", "calt", "onum";
   text-rendering: optimizeLegibility;
+  transition: background-color 450ms var(--ease-soft), color 450ms var(--ease-soft);
+}
+
+/* ── Themes ──────────────────────────────────────────────
+   Bright is the :root default (from @theme). Dark and electric
+   override the same CSS variables, so every utility re-themes.
+   ──────────────────────────────────────────────────────── */
+
+/* Dark — warm near-black, soft cream. Calm, not cyberpunk. */
+[data-theme="dark"] {
+  --color-paper: #16140F;
+  --color-paper-warm: #1C1A14;
+  --color-paper-raised: #201D16;
+  --color-ink: #ECE6D8;
+  --color-ink-soft: #C9C2B4;
+  --color-ink-muted: #8E8779;
+  --color-ink-faint: #5E594E;
+  --color-rule: #322E26;
+  --color-rule-soft: #28251E;
+  --color-accent: #D08A6E;
+  color-scheme: dark;
+}
+
+/* Electric — deep blue-black base, vivid cyan, alive with a drifting aurora. */
+[data-theme="electric"] {
+  --color-paper: #060A12;
+  --color-paper-warm: #0A111C;
+  --color-paper-raised: #0E1825;
+  --color-ink: #EAF4FA;
+  --color-ink-soft: #AFC2D2;
+  --color-ink-muted: #6E8090;
+  --color-ink-faint: #43525F;
+  --color-rule: #1A2735;
+  --color-rule-soft: #131F2B;
+  --color-accent: #34E3FF;
+  --glow: #34E3FF;
+  --glow-2: #7C5BFF;
+  color-scheme: dark;
+}
+
+/* Smooth cross-fade while switching themes (briefly enabled by JS). */
+html.theming,
+html.theming * {
+  transition: background-color 450ms var(--ease-soft),
+    border-color 450ms var(--ease-soft), color 450ms var(--ease-soft),
+    box-shadow 450ms var(--ease-soft) !important;
 }
 
 ::selection {
@@ -53,6 +107,34 @@ body::before {
     radial-gradient(circle at 12% 18%, rgba(0,0,0,0.018) 0, transparent 40%),
     radial-gradient(circle at 88% 82%, rgba(0,0,0,0.018) 0, transparent 40%);
 }
+/* On dark surfaces the warmth comes from light, not shadow. */
+[data-theme="dark"] body::before,
+[data-theme="electric"] body::before {
+  background-image:
+    radial-gradient(circle at 12% 18%, rgba(255,255,255,0.022) 0, transparent 42%),
+    radial-gradient(circle at 88% 82%, rgba(255,255,255,0.022) 0, transparent 42%);
+}
+
+/* Electric only: a slow, living aurora drifting behind the content. */
+[data-theme="electric"] body::after {
+  content: "";
+  position: fixed;
+  inset: -20%;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(38% 46% at 18% 22%, color-mix(in srgb, var(--glow) 22%, transparent), transparent 70%),
+    radial-gradient(42% 52% at 84% 30%, color-mix(in srgb, var(--glow-2) 20%, transparent), transparent 72%),
+    radial-gradient(46% 50% at 60% 88%, color-mix(in srgb, var(--glow) 16%, transparent), transparent 74%);
+  filter: blur(30px);
+  opacity: 0.9;
+  animation: aurora 16s ease-in-out infinite alternate;
+}
+@keyframes aurora {
+  0%   { transform: translate3d(-2.5%, -2%, 0) scale(1.04); opacity: 0.65; }
+  50%  { transform: translate3d(2.5%, 2.5%, 0) scale(1.16); opacity: 1; }
+  100% { transform: translate3d(-1.5%, 3%, 0) scale(1.08); opacity: 0.8; }
+}
 
 /* Links */
 a {
@@ -65,6 +147,8 @@ a:hover {
   color: var(--color-accent);
   border-bottom-color: var(--color-accent);
 }
+/* Links that opt out of the underline (buttons, nav, headings) */
+a.bare { border-bottom: 0; }
 
 /* Type primitives */
 .display { font-family: var(--font-display); font-style: italic; }
@@ -74,6 +158,15 @@ a:hover {
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.04em;
+  color: var(--color-ink-muted);
+  text-transform: lowercase;
+}
+
+/* Section eyebrow label — the "— projects" style, slightly refined */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
   color: var(--color-ink-muted);
   text-transform: lowercase;
 }
@@ -88,4 +181,271 @@ a:hover {
 .rule {
   border: 0;
   border-top: 1px solid var(--color-rule);
+}
+.rule-soft {
+  border: 0;
+  border-top: 1px solid var(--color-rule-soft);
+}
+
+/* Anchor offset so the sticky nav never covers a heading */
+.anchor { scroll-margin-top: 88px; }
+
+/* ── Live status dot ──────────────────────────────────── */
+.status-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--color-accent);
+  position: relative;
+}
+.status-dot::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 999px;
+  background: var(--color-accent);
+  opacity: 0.35;
+  animation: pulse 2600ms var(--ease-soft) infinite;
+}
+@keyframes pulse {
+  0%   { transform: scale(0.7); opacity: 0.35; }
+  70%  { transform: scale(1.9); opacity: 0; }
+  100% { transform: scale(1.9); opacity: 0; }
+}
+
+/* ── Refined CTA buttons ──────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  padding: 0.6rem 1rem;
+  border: 1px solid var(--color-rule);
+  border-radius: 8px;
+  background: var(--color-paper-raised);
+  color: var(--color-ink-soft);
+  transition: transform 260ms var(--ease-soft), border-color 260ms ease,
+    background 260ms ease, color 260ms ease, box-shadow 260ms var(--ease-soft);
+}
+.btn:hover {
+  color: var(--color-ink);
+  border-color: var(--color-ink-faint);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px -12px rgba(26, 25, 22, 0.35);
+}
+.btn-primary {
+  background: var(--color-ink);
+  color: var(--color-paper);
+  border-color: var(--color-ink);
+}
+.btn-primary:hover {
+  color: var(--color-paper);
+  background: #000;
+  border-color: var(--color-ink);
+}
+
+/* ── Tags / pills (systems, proof of work) ────────────── */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.01em;
+  color: var(--color-ink-soft);
+  padding: 0.32rem 0.7rem;
+  border: 1px solid var(--color-rule);
+  border-radius: 999px;
+  background: var(--color-paper-raised);
+  transition: border-color 220ms ease, color 220ms ease, transform 220ms var(--ease-soft);
+}
+.tag:hover {
+  border-color: var(--color-ink-faint);
+  color: var(--color-ink);
+  transform: translateY(-1px);
+}
+
+/* ── Soft card — used for journal / case-study blocks ─── */
+.card {
+  border-top: 1px solid var(--color-rule);
+  padding-top: 1.5rem;
+  transition: border-color 300ms ease;
+}
+
+/* Project name link with elegant hover */
+.link-head {
+  border-bottom: 0;
+  transition: color 220ms ease;
+}
+.link-head:hover { color: var(--color-accent); }
+
+/* ── Scroll reveal ────────────────────────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  filter: blur(6px);
+  transition:
+    opacity 900ms var(--ease-soft),
+    transform 900ms var(--ease-soft),
+    filter 900ms var(--ease-soft);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform, filter;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+  filter: blur(0);
+}
+
+/* ── Quiet sticky nav ─────────────────────────────────── */
+.topnav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  transition: background 400ms ease, border-color 400ms ease, backdrop-filter 400ms ease;
+  border-bottom: 1px solid transparent;
+}
+.topnav.scrolled {
+  background: color-mix(in srgb, var(--color-paper) 78%, transparent);
+  backdrop-filter: saturate(120%) blur(10px);
+  -webkit-backdrop-filter: saturate(120%) blur(10px);
+  border-bottom-color: var(--color-rule-soft);
+}
+.topnav a { border-bottom: 0; }
+.topnav .nav-link {
+  color: var(--color-ink-muted);
+  transition: color 200ms ease;
+}
+.topnav .nav-link:hover { color: var(--color-ink); }
+
+/* ── Theme dock (floating, bottom-right corner) ───────── */
+.theme-dock {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 4px;
+  border: 1px solid var(--color-rule);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-paper) 72%, transparent);
+  backdrop-filter: saturate(140%) blur(12px);
+  -webkit-backdrop-filter: saturate(140%) blur(12px);
+  box-shadow: 0 10px 30px -16px rgba(0, 0, 0, 0.5);
+  transition: border-color 300ms ease, background 300ms ease;
+}
+.theme-dock button {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  color: var(--color-ink-faint);
+  background: transparent;
+  cursor: pointer;
+  transition: color 220ms ease, background 220ms ease, transform 220ms var(--ease-soft);
+}
+.theme-dock button:hover {
+  color: var(--color-ink-soft);
+  transform: translateY(-1px);
+}
+.theme-dock button[aria-pressed="true"] {
+  color: var(--color-paper);
+  background: var(--color-ink);
+}
+.theme-dock svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+/* The bolt always shimmers a little — a quiet tell for the energetic theme. */
+.ico-bolt {
+  animation: bolt-flicker 3.2s ease-in-out infinite;
+}
+@keyframes bolt-flicker {
+  0%, 100% { opacity: 0.55; }
+  45%      { opacity: 1; }
+  55%      { opacity: 0.78; }
+}
+
+/* ── Electric: this theme should feel alive ───────────── */
+[data-theme="electric"] .theme-dock button[aria-pressed="true"] {
+  background: var(--color-accent);
+  color: #04141c;
+  box-shadow: 0 0 16px 0 color-mix(in srgb, var(--color-accent) 65%, transparent);
+}
+[data-theme="electric"] .status-dot {
+  box-shadow: 0 0 12px 1px color-mix(in srgb, var(--color-accent) 75%, transparent);
+}
+[data-theme="electric"] .status-dot::after {
+  animation-duration: 1800ms;
+  box-shadow: 0 0 14px 2px color-mix(in srgb, var(--color-accent) 60%, transparent);
+}
+[data-theme="electric"] a:hover {
+  text-shadow: 0 0 16px color-mix(in srgb, var(--color-accent) 55%, transparent);
+}
+[data-theme="electric"] .btn-primary {
+  box-shadow: 0 0 26px -6px color-mix(in srgb, var(--color-accent) 65%, transparent);
+}
+[data-theme="electric"] .btn-primary:hover {
+  background: var(--color-accent);
+  color: #04141c;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 34px -4px color-mix(in srgb, var(--color-accent) 80%, transparent);
+}
+[data-theme="electric"] .tag:hover {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 14px -4px color-mix(in srgb, var(--color-accent) 70%, transparent);
+}
+/* The accent display word gets a soft electric breathing glow. */
+[data-theme="electric"] .display {
+  color: var(--color-accent);
+  text-shadow: 0 0 18px color-mix(in srgb, var(--color-accent) 30%, transparent);
+  animation: electric-breathe 4.5s ease-in-out infinite;
+}
+@keyframes electric-breathe {
+  0%, 100% { text-shadow: 0 0 14px color-mix(in srgb, var(--color-accent) 22%, transparent); }
+  50%      { text-shadow: 0 0 26px color-mix(in srgb, var(--color-accent) 50%, transparent); }
+}
+/* A thin energy line under the nav once it solidifies. */
+[data-theme="electric"] .topnav.scrolled {
+  border-bottom-color: transparent;
+  background-image: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--color-accent) 55%, transparent),
+    transparent
+  );
+  background-repeat: no-repeat;
+  background-position: bottom;
+  background-size: 200% 1px;
+  animation: line-sweep 6s linear infinite;
+}
+@keyframes line-sweep {
+  0%   { background-position: -100% bottom; }
+  100% { background-position: 100% bottom; }
+}
+
+/* Respect reduced-motion: no transforms, no blur, no smooth scroll, no pulse */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .reveal {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    transition: none;
+  }
+  .status-dot::after { animation: none; }
+  .btn:hover, .tag:hover { transform: none; }
+  .ico-bolt,
+  [data-theme="electric"] body::after,
+  [data-theme="electric"] .display,
+  [data-theme="electric"] .topnav.scrolled { animation: none; }
 }
